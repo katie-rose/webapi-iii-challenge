@@ -8,7 +8,7 @@ router.post("/", validateUser, (req, res) => {
       res.status(200).json(user);
     })
     .catch(err => {
-      res.status(500).json({ error: "error adding user" });
+      res.status(500).json({ error: "Error adding user" });
     });
 });
 
@@ -20,7 +20,7 @@ router.get("/", (req, res) => {
       res.status(200).json(users);
     })
     .catch(err => {
-      res.status(500).json({ error: "error retrieving users" });
+      res.status(500).json({ error: "Error retrieving users" });
     });
 });
 
@@ -31,7 +31,7 @@ router.get("/:id", validateUserId, (req, res) => {
       res.status(200).json(user);
     })
     .catch(err => {
-      res.status(500).json({ error: "error retrieving user" });
+      res.status(500).json({ error: "Error retrieving user" });
     });
 });
 
@@ -51,18 +51,32 @@ function validateUserId(req, res, next) {
         req.user = user;
         next();
       } else {
-        res.status(400).json({ message: "invalid user id" });
+        res.status(400).json({ message: "Invalid user id" });
       }
     })
     .catch(err => {
       res.status(500).json({
-        error: "There was an error accessing that user from the database."
+        error: "There was an error accessing that user from the database"
       });
     });
 }
 
-function validateUser(req, res, next) {}
+function validateUser(req, res, next) {
+  if (!req.body) {
+    res.status(400).json({ message: "User data is missing" });
+  } else if (!req.body.name) {
+    res.status(400).json({ message: "Required name field is missing" });
+  }
+  next();
+}
 
-function validatePost(req, res, next) {}
+function validatePost(req, res, next) {
+  if (!req.body) {
+    res.status(400).json({ message: "Post data is missing" });
+  } else if (!req.body.text) {
+    res.status(400).json({ message: "Required text field is missing" });
+  }
+  next();
+}
 
 module.exports = router;
