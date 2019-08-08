@@ -50,8 +50,7 @@ router.get("/:id", validateUserId, (req, res) => {
 });
 
 router.get("/:id/posts", validateUserId, (req, res) => {
-  const id = req.params.id;
-  db.getUserPosts(id)
+  db.getUserPosts(req.params.id)
     .then(posts => {
       res.status(200).json(posts);
     })
@@ -104,21 +103,27 @@ function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-  if (!req.body) {
+  const body = req.body;
+  const name = req.body.name;
+  if (!body) {
     res.status(400).json({ message: "User data is missing" });
-  } else if (!req.body.name) {
+  } else if (!name) {
     res.status(400).json({ message: "Required name field is missing" });
+  } else {
+    next();
   }
-  next();
 }
 
 function validatePost(req, res, next) {
-  if (!req.body) {
-    res.status(400).json({ message: "Post data is missing" });
-  } else if (!req.body.text) {
-    res.status(400).json({ message: "Required text field is missing" });
-  }
-  next();
+   const body = req.body;
+   const text = req.body.text;
+   if (!body) {
+     res.status(400).json({ message: "User post is missing" });
+   } else if (!text) {
+     res.status(400).json({ message: "Required text field is missing" });
+   } else {
+     next();
+   }
 }
 
 module.exports = router;

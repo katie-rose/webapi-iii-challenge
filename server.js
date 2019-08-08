@@ -10,8 +10,12 @@ server.get("/", (req, res) => {
 //custom middleware
 
 function logger(req, res, next) {
-  res.status(200).json({ api: "the logger is working" });
-    next();
+  const method = req.method;
+  const url = req.url;
+  console.log(
+    `you made a ${method} request to ${url} on [${new Date().toISOString()}]`
+  );
+  next();
 }
 
 module.exports = server;
