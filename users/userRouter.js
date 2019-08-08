@@ -13,19 +13,18 @@ router.post("/", validateUser, (req, res) => {
     });
 });
 
-router.post("/:id/posts", validateUserId, (req, res) => {
-  if (req.body) {
+router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
+req.body.user_id = req.params.id;
     postDb
       .insert(req.body)
       .then(post => {
-        res.status(200).json(post);
+        res.status(201).json(post);
       })
       .catch(err => {
         res.status(500).json({
           error: "There was an error posting to the database"
         });
       });
-  }
 });
 
 router.get("/", (req, res) => {
@@ -41,8 +40,8 @@ router.get("/", (req, res) => {
 router.get("/:id", validateUserId, (req, res) => {
   const id = req.params.id;
   db.getById(id)
-    .then(user => {
-      res.status(200).json(user);
+    .then(users => {
+      res.status(200).json(users);
     })
     .catch(err => {
       res.status(500).json({ error: "Error retrieving user" });
@@ -71,11 +70,11 @@ router.delete("/:id", validateUserId, (req, res) => {
 });
 
 router.put("/:id", validateUserId, validateUser, (req, res) => {
-  const id = req.params.id;
+  const { id }  = req.params;
   const changes = req.body;
   db.update(id, changes)
-    .then(user => {
-      res.status(201).json({ user: `${id} successfully updated!` });
+    .then(update => {
+      res.status(200).json(update);
     })
     .catch(err => {
       res.status(500).json({ error: "Error updating user" });
@@ -115,15 +114,15 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-   const body = req.body;
-   const text = req.body.text;
-   if (!body) {
-     res.status(400).json({ message: "User post is missing" });
-   } else if (!text) {
-     res.status(400).json({ message: "Required text field is missing" });
-   } else {
-     next();
-   }
+  const body = req.body;
+  const text = req.body.text;
+  if (!body) {
+    res.status(400).json({ message: "User post is missing" });
+  } else if (!text) {
+    res.status(400).json({ message: "Required text field is missing" });
+  } else {
+    next();
+  }
 }
 
 module.exports = router;
